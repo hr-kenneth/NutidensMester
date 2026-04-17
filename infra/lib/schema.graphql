@@ -1,0 +1,43 @@
+type Group {
+  groupId: ID!
+  name: String!
+  memberCount: Int!
+  createdAt: AWSDateTime!
+  mesterName: String
+  currentCycleNumber: Int!
+  roundsPlayedInCycle: Int!
+}
+
+type Member {
+  groupId: ID!
+  username: String!
+  displayName: String!
+  joinedAt: AWSDateTime!
+}
+
+type Round {
+  groupId: ID!
+  cycleNumber: Int!
+  roundNumber: Int!
+  winner: String!
+  winnerDisplayName: String!
+  recordedBy: String!
+  recordedAt: AWSDateTime!
+}
+
+type Query {
+  listMyGroups: [Group!]!
+  listMembers(groupId: ID!): [Member!]!
+  listRoundsInCycle(groupId: ID!, cycleNumber: Int!): [Round!]!
+}
+
+type Mutation {
+  createGroup(name: String!, displayName: String!): Group!
+  joinGroup(groupId: ID!, displayName: String!): Member!
+  recordRound(groupId: ID!, winner: String!): Round!
+}
+
+type Subscription {
+  onRoundAdded(groupId: ID!): Round
+    @aws_subscribe(mutations: ["recordRound"])
+}

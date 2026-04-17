@@ -1,0 +1,142 @@
+{
+  "/NutidensMesterStack/Table": [
+    {
+      "type": "aws:cdk:hasPhysicalName",
+      "data": {
+        "Ref": "TableCD117FA1"
+      }
+    }
+  ],
+  "/NutidensMesterStack/GraphqlUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GraphqlUrl"
+    }
+  ],
+  "/NutidensMesterStack/Region": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "Region"
+    }
+  ],
+  "/NutidensMesterStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/NutidensMesterStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/NutidensMesterStack/Table/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "TableCD117FA1"
+    }
+  ],
+  "/NutidensMesterStack/ResolverFn/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ResolverFn9074B9B1"
+    }
+  ],
+  "/NutidensMesterStack/Api/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiF70053CD"
+    }
+  ],
+  "/NutidensMesterStack/Api/Schema": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiSchema510EECD7"
+    }
+  ],
+  "/NutidensMesterStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/NutidensMesterStack/ResolverFn/ServiceRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ResolverFnServiceRoleA589A379"
+    }
+  ],
+  "/NutidensMesterStack/Api/LambdaDs/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiLambdaDs5A3E604C"
+    }
+  ],
+  "/NutidensMesterStack/Api/NoneDs/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiNoneDsEAC3DBAA"
+    }
+  ],
+  "/NutidensMesterStack/Api/Query_listMyGroups/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiQuerylistMyGroupsB42DF3E7"
+    }
+  ],
+  "/NutidensMesterStack/Api/Query_listMembers/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiQuerylistMembersE53F7D99"
+    }
+  ],
+  "/NutidensMesterStack/Api/Query_listRoundsInCycle/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiQuerylistRoundsInCycle0BA2EFE2"
+    }
+  ],
+  "/NutidensMesterStack/Api/Mutation_createGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiMutationcreateGroupFBB4E325"
+    }
+  ],
+  "/NutidensMesterStack/Api/Mutation_joinGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiMutationjoinGroup7E36366D"
+    }
+  ],
+  "/NutidensMesterStack/Api/Mutation_recordRound/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiMutationrecordRound58FC53E5"
+    }
+  ],
+  "/NutidensMesterStack/Api/Subscription_onRoundAdded/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiSubscriptiononRoundAdded8288C583"
+    }
+  ],
+  "/NutidensMesterStack/ResolverFn/ServiceRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ResolverFnServiceRoleDefaultPolicyFBF6AE4E"
+    }
+  ],
+  "/NutidensMesterStack/Api/LambdaDs/ServiceRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiLambdaDsServiceRole4FA15692"
+    }
+  ],
+  "/NutidensMesterStack/Api/LambdaDs/ServiceRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiLambdaDsServiceRoleDefaultPolicy55A77837"
+    }
+  ]
+}

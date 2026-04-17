@@ -1,0 +1,21 @@
+{
+  "name": "nutidens-mester-infra",
+  "private": true,
+  "scripts": {
+    "deploy": "cdk deploy",
+    "diff": "cdk diff",
+    "synth": "cdk synth"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.140.0",
+    "constructs": "^10.0.0"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3",
+    "@aws-sdk/lib-dynamodb": "^3",
+    "aws-cdk": "^2.140.0",
+    "esbuild": "^0.20.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}

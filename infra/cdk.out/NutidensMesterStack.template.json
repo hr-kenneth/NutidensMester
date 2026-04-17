@@ -1,0 +1,572 @@
+{
+ "Resources": {
+  "TableCD117FA1": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "PK",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "SK",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "GSI1PK",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "GSI1SK",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "GSI1",
+      "KeySchema": [
+       {
+        "AttributeName": "GSI1PK",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "GSI1SK",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "PK",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "SK",
+      "KeyType": "RANGE"
+     }
+    ],
+    "TableName": "NutidensMester"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Table/Resource"
+   }
+  },
+  "ResolverFnServiceRoleA589A379": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/ResolverFn/ServiceRole/Resource"
+   }
+  },
+  "ResolverFnServiceRoleDefaultPolicyFBF6AE4E": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "TableCD117FA1",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "TableCD117FA1",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "TableCD117FA1",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "TableCD117FA1",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ResolverFnServiceRoleDefaultPolicyFBF6AE4E",
+    "Roles": [
+     {
+      "Ref": "ResolverFnServiceRoleA589A379"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/ResolverFn/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ResolverFn9074B9B1": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-403884280015-eu-central-1",
+     "S3Key": "02c6e2fb6007381e11ae2f6b766f20b4713798ce4d6c7913efc83faa0bba8e0d.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "TABLE_NAME": {
+       "Ref": "TableCD117FA1"
+      }
+     }
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "ResolverFnServiceRoleA589A379",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10
+   },
+   "DependsOn": [
+    "ResolverFnServiceRoleDefaultPolicyFBF6AE4E",
+    "ResolverFnServiceRoleA589A379"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/ResolverFn/Resource",
+    "aws:asset:path": "asset.02c6e2fb6007381e11ae2f6b766f20b4713798ce4d6c7913efc83faa0bba8e0d",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ApiF70053CD": {
+   "Type": "AWS::AppSync::GraphQLApi",
+   "Properties": {
+    "AuthenticationType": "AMAZON_COGNITO_USER_POOLS",
+    "Name": "NutidensMesterApi",
+    "UserPoolConfig": {
+     "AwsRegion": "eu-central-1",
+     "DefaultAction": "ALLOW",
+     "UserPoolId": "eu-central-1_GEhgXAKfw"
+    },
+    "XrayEnabled": false
+   },
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/Resource"
+   }
+  },
+  "ApiSchema510EECD7": {
+   "Type": "AWS::AppSync::GraphQLSchema",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "Definition": "type Group {\n  groupId: ID!\n  name: String!\n  memberCount: Int!\n  createdAt: AWSDateTime!\n  mesterName: String\n  currentCycleNumber: Int!\n  roundsPlayedInCycle: Int!\n}\n\ntype Member {\n  groupId: ID!\n  username: String!\n  displayName: String!\n  joinedAt: AWSDateTime!\n}\n\ntype Round {\n  groupId: ID!\n  cycleNumber: Int!\n  roundNumber: Int!\n  winner: String!\n  winnerDisplayName: String!\n  recordedBy: String!\n  recordedAt: AWSDateTime!\n}\n\ntype Query {\n  listMyGroups: [Group!]!\n  listMembers(groupId: ID!): [Member!]!\n  listRoundsInCycle(groupId: ID!, cycleNumber: Int!): [Round!]!\n}\n\ntype Mutation {\n  createGroup(name: String!, displayName: String!): Group!\n  joinGroup(groupId: ID!, displayName: String!): Member!\n  recordRound(groupId: ID!, winner: String!): Round!\n}\n\ntype Subscription {\n  onRoundAdded(groupId: ID!): Round\n    @aws_subscribe(mutations: [\"recordRound\"])\n}\n"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/Schema"
+   }
+  },
+  "ApiLambdaDsServiceRole4FA15692": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/LambdaDs/ServiceRole/Resource"
+   }
+  },
+  "ApiLambdaDsServiceRoleDefaultPolicy55A77837": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "ResolverFn9074B9B1",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "ResolverFn9074B9B1",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ApiLambdaDsServiceRoleDefaultPolicy55A77837",
+    "Roles": [
+     {
+      "Ref": "ApiLambdaDsServiceRole4FA15692"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/LambdaDs/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ApiLambdaDs5A3E604C": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "LambdaConfig": {
+     "LambdaFunctionArn": {
+      "Fn::GetAtt": [
+       "ResolverFn9074B9B1",
+       "Arn"
+      ]
+     }
+    },
+    "Name": "LambdaDs",
+    "ServiceRoleArn": {
+     "Fn::GetAtt": [
+      "ApiLambdaDsServiceRole4FA15692",
+      "Arn"
+     ]
+    },
+    "Type": "AWS_LAMBDA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/LambdaDs/Resource"
+   }
+  },
+  "ApiNoneDsEAC3DBAA": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "Name": "NoneDs",
+    "Type": "NONE"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/NoneDs/Resource"
+   }
+  },
+  "ApiQuerylistMyGroupsB42DF3E7": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "LambdaDs",
+    "FieldName": "listMyGroups",
+    "Kind": "UNIT",
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "ApiLambdaDs5A3E604C",
+    "ApiSchema510EECD7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/Query_listMyGroups/Resource"
+   }
+  },
+  "ApiQuerylistMembersE53F7D99": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "LambdaDs",
+    "FieldName": "listMembers",
+    "Kind": "UNIT",
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "ApiLambdaDs5A3E604C",
+    "ApiSchema510EECD7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/Query_listMembers/Resource"
+   }
+  },
+  "ApiQuerylistRoundsInCycle0BA2EFE2": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "LambdaDs",
+    "FieldName": "listRoundsInCycle",
+    "Kind": "UNIT",
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "ApiLambdaDs5A3E604C",
+    "ApiSchema510EECD7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/Query_listRoundsInCycle/Resource"
+   }
+  },
+  "ApiMutationcreateGroupFBB4E325": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "LambdaDs",
+    "FieldName": "createGroup",
+    "Kind": "UNIT",
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "ApiLambdaDs5A3E604C",
+    "ApiSchema510EECD7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/Mutation_createGroup/Resource"
+   }
+  },
+  "ApiMutationjoinGroup7E36366D": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "LambdaDs",
+    "FieldName": "joinGroup",
+    "Kind": "UNIT",
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "ApiLambdaDs5A3E604C",
+    "ApiSchema510EECD7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/Mutation_joinGroup/Resource"
+   }
+  },
+  "ApiMutationrecordRound58FC53E5": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "LambdaDs",
+    "FieldName": "recordRound",
+    "Kind": "UNIT",
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "ApiLambdaDs5A3E604C",
+    "ApiSchema510EECD7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/Mutation_recordRound/Resource"
+   }
+  },
+  "ApiSubscriptiononRoundAdded8288C583": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ApiF70053CD",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "NoneDs",
+    "FieldName": "onRoundAdded",
+    "Kind": "UNIT",
+    "RequestMappingTemplate": "{\"version\":\"2018-05-29\",\"payload\":$util.toJson($context.arguments)}",
+    "ResponseMappingTemplate": "$util.toJson(null)",
+    "TypeName": "Subscription"
+   },
+   "DependsOn": [
+    "ApiNoneDsEAC3DBAA",
+    "ApiSchema510EECD7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/Api/Subscription_onRoundAdded/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WQzW7CMBCEn4W7s4VAHwCo6AXRNuk92jgGnPivWRsUWXn3Kg6q6GnmW++ORs4hf13CcoF3ynjTZUrWEEuPvGN4pyo2g0FtmxriN9ZKsP3ZJDMyhbpusDK2ES3BKckhGO6lNUyihljY+SDpp1WSDxPObmS0rpBIeILtJIzWsAu8E36HJB7xsD+bv1B0jgbDIb736K4/auvklJfo6/ifSn4VGtkxpbyhx9KGnqc6T3SyRjxhIciqm+hT6YcfxzRO76ln6fEizWXa+QjeBT+y6Q+gpZdbvoHVBlaLlqTM+mC81AKKWX8BKkrjCmoBAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "NutidensMesterStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "GraphqlUrl": {
+   "Description": "Set as VITE_APPSYNC_URL in .env.local",
+   "Value": {
+    "Fn::GetAtt": [
+     "ApiF70053CD",
+     "GraphQLUrl"
+    ]
+   }
+  },
+  "Region": {
+   "Description": "Set as VITE_AWS_REGION in .env.local",
+   "Value": "eu-central-1"
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
