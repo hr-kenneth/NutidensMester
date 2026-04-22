@@ -182,7 +182,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-403884280015-eu-central-1",
-     "S3Key": "02c6e2fb6007381e11ae2f6b766f20b4713798ce4d6c7913efc83faa0bba8e0d.zip"
+     "S3Key": "a6892d8219ce45b92db5d578a49e689ab3797a01afce1e26973bfb0e05608dd2.zip"
     },
     "Environment": {
      "Variables": {
@@ -198,7 +198,7 @@
       "Arn"
      ]
     },
-    "Runtime": "nodejs20.x",
+    "Runtime": "python3.12",
     "Timeout": 10
    },
    "DependsOn": [
@@ -207,8 +207,8 @@
    ],
    "Metadata": {
     "aws:cdk:path": "NutidensMesterStack/ResolverFn/Resource",
-    "aws:asset:path": "asset.02c6e2fb6007381e11ae2f6b766f20b4713798ce4d6c7913efc83faa0bba8e0d",
-    "aws:asset:is-bundled": true,
+    "aws:asset:path": "asset.a6892d8219ce45b92db5d578a49e689ab3797a01afce1e26973bfb0e05608dd2",
+    "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
   },
@@ -513,7 +513,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WQzW7CMBCEn4W7s4VAHwCo6AXRNuk92jgGnPivWRsUWXn3Kg6q6GnmW++ORs4hf13CcoF3ynjTZUrWEEuPvGN4pyo2g0FtmxriN9ZKsP3ZJDMyhbpusDK2ES3BKckhGO6lNUyihljY+SDpp1WSDxPObmS0rpBIeILtJIzWsAu8E36HJB7xsD+bv1B0jgbDIb736K4/auvklJfo6/ifSn4VGtkxpbyhx9KGnqc6T3SyRjxhIciqm+hT6YcfxzRO76ln6fEizWXa+QjeBT+y6Q+gpZdbvoHVBlaLlqTM+mC81AKKWX8BKkrjCmoBAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WOzU7DMBCEn6V3ZylNeYAWBJcKSsK92jhuY+I/sjZVZPndkR2Qymnm29nVzgY2D2tYr/BKFe/HSskOYuuRjwyvdIr9bFDbvoP4gZ0S7PFsiklMoe56hPgcDPfSmhz9+cQkaoiNXS6KHq2SfM64uMSoPiGR8AS7LIxq2Ac+Cr9HEgydo9lwiC8TuuFL7ZzMx4XeD/+p5YPQyA6l0hN6bG2YePl9Q6/WiBtsBFn1LabS8NenVMYlL6VajxdpLnnnLXgXfGLH2Q/W3NVwv4Xt6pOkrKZgvNQCmkV/APmJVSlVAQAA"
    },
    "Metadata": {
     "aws:cdk:path": "NutidensMesterStack/CDKMetadata/Default"

@@ -54,7 +54,7 @@ The frontend uses **AWS Amplify** — a library that handles communication with 
 | **AWS DynamoDB** | A NoSQL database that stores all data: groups, memberships, and round results. |
 
 ### Infrastructure as code
-The backend infrastructure is defined in TypeScript using **AWS CDK** (Cloud Development Kit). Instead of clicking through the AWS console to create resources, the CDK code describes exactly what should exist, and AWS builds it automatically. The infrastructure lives in the `infra/` folder.
+The backend infrastructure is defined in **Python** using **AWS CDK** (Cloud Development Kit). Instead of clicking through the AWS console to create resources, the CDK code describes exactly what should exist, and AWS builds it automatically. The infrastructure lives in the `infra/` folder.
 
 ---
 
@@ -78,7 +78,7 @@ The **Group** record stores the current cycle state directly: how many rounds ha
 
 ```
 NutidensMester/
-├── src/                        # Frontend (React app)
+├── src/                        # Frontend (React + TypeScript)
 │   ├── aws-config.ts           # Connects Amplify to Cognito and AppSync
 │   ├── App.tsx                 # Top-level routing between pages
 │   ├── graphql/
@@ -88,13 +88,15 @@ NutidensMester/
 │       ├── GroupsPage.tsx      # List of groups, create group, join group
 │       └── GroupPage.tsx       # Scoreboard, cycle progress, record a round
 │
-├── infra/                      # Backend infrastructure (AWS CDK)
-│   ├── bin/app.ts              # CDK entry point
+├── infra/                      # Backend infrastructure (Python + AWS CDK)
+│   ├── app.py                  # CDK entry point
+│   ├── requirements.txt        # Python CDK dependencies
+│   ├── nutidens_mester/
+│   │   └── stack.py            # Defines all AWS resources
 │   ├── lib/
-│   │   ├── stack.ts            # Defines all AWS resources
 │   │   └── schema.graphql      # GraphQL API schema (types + operations)
 │   └── lambda/
-│       └── index.ts            # Lambda function (all resolver logic)
+│       └── index.py            # Lambda function (all resolver logic, Python + boto3)
 │
 ├── .env.local                  # Secret config values (not committed to git)
 └── package.json                # Frontend dependencies
@@ -132,20 +134,26 @@ The app will be available at `http://localhost:5173`.
 
 ## Deploying the backend
 
-Prerequisites: AWS CLI installed and configured with an SSO profile.
+Prerequisites: AWS CLI installed and configured with an SSO profile, and Python 3.12+ installed.
 
-```bash
-# Log in
+```cmd
+:: Log in
 aws sso login --profile <your-profile>
 
-# First time only — sets up CDK in your AWS account
+:: First time only — create a Python virtual environment and install CDK dependencies
 cd infra
-npm install
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+:: First deploy only — sets up CDK in your AWS account
 set "COGNITO_USER_POOL_ID=<your-user-pool-id>" && npx cdk bootstrap --profile <your-profile>
 
-# Deploy
+:: Deploy (activate the venv first if it isn't already)
 set "COGNITO_USER_POOL_ID=<your-user-pool-id>" && npx cdk deploy --profile <your-profile>
 ```
+
+> The `npx cdk` command (from `node_modules`) is still used to run CDK. It invokes `python app.py` internally, which is why the Python venv must be active.
 
 After deploying, copy the `GraphqlUrl` value from the output into `.env.local` as `VITE_APPSYNC_URL`.
 

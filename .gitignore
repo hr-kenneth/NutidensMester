@@ -1,3 +1,8 @@
 node_modules
 dist
 .env.local
+.venv
+infra/cdk.out
+infra/__pycache__
+infra/nutidens_mester/__pycache__
+infra/lambda/__pycache__
