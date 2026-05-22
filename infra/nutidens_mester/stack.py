@@ -59,7 +59,7 @@ class NutidensMesterStack(cdk.Stack):
         table.grant_read_write_data(resolver_fn)
 
         resolver_fn.add_to_role_policy(iam.PolicyStatement(
-            actions=["cognito-idp:AdminCreateUser", "cognito-idp:AdminDeleteUser"],
+            actions=["cognito-idp:AdminCreateUser", "cognito-idp:AdminDeleteUser", "cognito-idp:ListUsers"],
             resources=[f"arn:aws:cognito-idp:eu-central-1:{self.account}:userpool/{user_pool_id}"],
         ))
 
@@ -90,7 +90,7 @@ class NutidensMesterStack(cdk.Stack):
         lambda_ds = api.add_lambda_data_source("LambdaDs", resolver_fn)
         none_ds = api.add_none_data_source("NoneDs")
 
-        for field_name in ["listMyGroups", "listMembers", "listRoundsInCycle"]:
+        for field_name in ["listMyGroups", "listMembers", "listRoundsInCycle", "listUsers"]:
             lambda_ds.create_resolver(
                 f"Query_{field_name}",
                 type_name="Query",

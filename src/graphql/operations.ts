@@ -46,6 +46,14 @@ export const RECORD_ROUND = /* GraphQL */ `
   }
 `;
 
+export const LIST_USERS = /* GraphQL */ `
+  query ListUsers {
+    listUsers {
+      username email
+    }
+  }
+`;
+
 export const CREATE_USER = /* GraphQL */ `
   mutation CreateUser($username: String!, $email: String!) {
     createUser(username: $username, email: $email)

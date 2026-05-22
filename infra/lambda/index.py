@@ -58,6 +58,7 @@ def handler(event, context):
         "listMyGroups":      lambda: list_my_groups(user_id),
         "listMembers":       lambda: list_members(args["groupId"], user_id),
         "listRoundsInCycle": lambda: list_rounds_in_cycle(args["groupId"], int(args["cycleNumber"]), user_id),
+        "listUsers":         lambda: list_users(is_admin),
         "createGroup":       lambda: create_group(args["name"], args["displayName"], user_id),
         "joinGroup":         lambda: join_group(args["groupId"], args["displayName"], user_id),
         "recordRound":       lambda: record_round(args["groupId"], args["winner"], user_id),
@@ -256,6 +257,25 @@ def record_round(group_id: str, winner: str, user_id: str):
         "roundNumber": new_round_number, "winner": winner,
         "winnerDisplayName": winner_name, "recordedBy": user_id, "recordedAt": now,
     }
+
+
+def list_users(is_admin: bool):
+    if not is_admin:
+        raise Exception("Not authorized")
+
+    users = []
+    kwargs = {"UserPoolId": COGNITO_USER_POOL_ID, "Limit": 60}
+    while True:
+        resp = _cognito.list_users(**kwargs)
+        for u in resp.get("Users", []):
+            email = next((a["Value"] for a in u.get("Attributes", []) if a["Name"] == "email"), None)
+            users.append({"username": u["Username"], "email": email})
+        pagination_token = resp.get("PaginationToken")
+        if not pagination_token:
+            break
+        kwargs["PaginationToken"] = pagination_token
+
+    return sorted(users, key=lambda u: u["username"].lower())
 
 
 def create_user(username: str, email: str, is_admin: bool):
