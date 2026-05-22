@@ -41,17 +41,13 @@ export default function LoginPage({ onSignIn }: { onSignIn: (username: string) =
     const form = e.currentTarget;
     const newPassword = (form.elements.namedItem("newPassword") as HTMLInputElement).value;
     const confirm = (form.elements.namedItem("confirmPassword") as HTMLInputElement).value;
-    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     if (newPassword !== confirm) {
       setError("Adgangskoderne er ikke ens.");
       setLoading(false);
       return;
     }
     try {
-      await confirmSignIn({
-        challengeResponse: newPassword,
-        options: { userAttributes: { email } },
-      });
+      await confirmSignIn({ challengeResponse: newPassword });
       onSignIn(pendingUsername);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Kunne ikke gemme ny adgangskode.");
@@ -121,20 +117,6 @@ export default function LoginPage({ onSignIn }: { onSignIn: (username: string) =
               Din midlertidige adgangskode er udløbet. Vælg en ny.
             </p>
             <form onSubmit={handleNewPassword} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="email" className="text-xs font-medium uppercase tracking-widest text-zinc-400">
-                  E-mail
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="din@email.dk"
-                  className={inputClass}
-                />
-              </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="newPassword" className="text-xs font-medium uppercase tracking-widest text-zinc-400">
                   Ny adgangskode
