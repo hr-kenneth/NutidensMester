@@ -46,6 +46,18 @@ export const RECORD_ROUND = /* GraphQL */ `
   }
 `;
 
+export const CREATE_USER = /* GraphQL */ `
+  mutation CreateUser($username: String!, $email: String!) {
+    createUser(username: $username, email: $email)
+  }
+`;
+
+export const DELETE_USER = /* GraphQL */ `
+  mutation DeleteUser($username: String!) {
+    deleteUser(username: $username)
+  }
+`;
+
 export const ON_ROUND_ADDED = /* GraphQL */ `
   subscription OnRoundAdded($groupId: ID!) {
     onRoundAdded(groupId: $groupId) {

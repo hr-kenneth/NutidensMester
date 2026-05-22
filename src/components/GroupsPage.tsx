@@ -15,6 +15,8 @@ interface Group {
 }
 
 interface Props {
+  isAdmin: boolean;
+  onAdmin: () => void;
   onSelectGroup: (
     groupId: string, groupName: string, mesterName: string | null,
     currentCycleNumber: number, roundsPlayedInCycle: number, memberCount: number
@@ -25,7 +27,7 @@ interface Props {
 const inputClass =
   "w-full rounded-xl border border-zinc-700 bg-zinc-800/60 px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400";
 
-export default function GroupsPage({ onSelectGroup, onSignOut }: Props) {
+export default function GroupsPage({ isAdmin, onAdmin, onSelectGroup, onSignOut }: Props) {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -102,12 +104,22 @@ export default function GroupsPage({ onSelectGroup, onSignOut }: Props) {
             </p>
             <h1 className="mt-1 text-2xl font-bold text-white">Mine grupper</h1>
           </div>
-          <button
-            onClick={handleSignOut}
-            className="text-xs text-zinc-500 transition hover:text-zinc-300"
-          >
-            Log ud
-          </button>
+          <div className="flex gap-4">
+            {isAdmin && (
+              <button
+                onClick={onAdmin}
+                className="text-xs text-zinc-500 transition hover:text-zinc-300"
+              >
+                Admin
+              </button>
+            )}
+            <button
+              onClick={handleSignOut}
+              className="text-xs text-zinc-500 transition hover:text-zinc-300"
+            >
+              Log ud
+            </button>
+          </div>
         </div>
 
         {error && !modal && <p className="mb-4 text-sm text-red-400">{error}</p>}

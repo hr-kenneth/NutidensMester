@@ -8,6 +8,7 @@ from aws_cdk import (
     aws_dynamodb as dynamodb,
     aws_appsync as appsync,
     aws_cognito as cognito,
+    aws_iam as iam,
     aws_lambda as lambda_,
 )
 from constructs import Construct
@@ -49,10 +50,18 @@ class NutidensMesterStack(cdk.Stack):
                 os.path.join(os.path.dirname(__file__), "../lambda")
             ),
             timeout=Duration.seconds(10),
-            environment={"TABLE_NAME": table.table_name},
+            environment={
+                "TABLE_NAME": table.table_name,
+                "COGNITO_USER_POOL_ID": user_pool_id,
+            },
         )
 
         table.grant_read_write_data(resolver_fn)
+
+        resolver_fn.add_to_role_policy(iam.PolicyStatement(
+            actions=["cognito-idp:AdminCreateUser", "cognito-idp:AdminDeleteUser"],
+            resources=[f"arn:aws:cognito-idp:eu-central-1:{self.account}:userpool/{user_pool_id}"],
+        ))
 
         # ── AppSync ───────────────────────────────────────────────────────────
 
@@ -88,7 +97,7 @@ class NutidensMesterStack(cdk.Stack):
                 field_name=field_name,
             )
 
-        for field_name in ["createGroup", "joinGroup", "recordRound"]:
+        for field_name in ["createGroup", "joinGroup", "recordRound", "createUser", "deleteUser"]:
             lambda_ds.create_resolver(
                 f"Mutation_{field_name}",
                 type_name="Mutation",

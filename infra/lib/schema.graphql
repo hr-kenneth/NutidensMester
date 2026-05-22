@@ -35,6 +35,8 @@ type Mutation {
   createGroup(name: String!, displayName: String!): Group!
   joinGroup(groupId: ID!, displayName: String!): Member!
   recordRound(groupId: ID!, winner: String!): Round!
+  createUser(username: String!, email: String!): Boolean!
+  deleteUser(username: String!): Boolean!
 }
 
 type Subscription {
