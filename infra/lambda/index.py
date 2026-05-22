@@ -8,14 +8,18 @@ from boto3.dynamodb.conditions import Key
 from boto3.dynamodb.types import TypeSerializer
 
 TABLE_NAME = os.environ["TABLE_NAME"]
+COGNITO_USER_POOL_ID = os.environ["COGNITO_USER_POOL_ID"]
 
 _resource = boto3.resource("dynamodb")
 _table = _resource.Table(TABLE_NAME)
 _client = boto3.client("dynamodb")
+_cognito = boto3.client("cognito-idp")
 _serializer = TypeSerializer()
 
 
 def _pad(n: int) -> str:
+    # Zero-pad to 8 digits so DynamoDB sorts ROUND# keys correctly as text
+    # e.g. cycle=1, round=2 → "ROUND#00000001|00000002"
     return str(n).zfill(8)
 
 
@@ -46,7 +50,9 @@ def _item_to_group(item: dict) -> dict:
 def handler(event, context):
     field_name = event["info"]["fieldName"]
     args = event.get("arguments", {})
-    user_id = event["identity"]["username"]
+    identity = event["identity"]
+    user_id = identity["username"]
+    is_admin = "Admins" in (identity.get("claims", {}).get("cognito:groups") or [])
 
     dispatch = {
         "listMyGroups":      lambda: list_my_groups(user_id),
@@ -55,6 +61,8 @@ def handler(event, context):
         "createGroup":       lambda: create_group(args["name"], args["displayName"], user_id),
         "joinGroup":         lambda: join_group(args["groupId"], args["displayName"], user_id),
         "recordRound":       lambda: record_round(args["groupId"], args["winner"], user_id),
+        "createUser":        lambda: create_user(args["username"], args["email"], is_admin),
+        "deleteUser":        lambda: delete_user(args["username"], is_admin),
     }
 
     fn = dispatch.get(field_name)
@@ -248,3 +256,27 @@ def record_round(group_id: str, winner: str, user_id: str):
         "roundNumber": new_round_number, "winner": winner,
         "winnerDisplayName": winner_name, "recordedBy": user_id, "recordedAt": now,
     }
+
+
+def create_user(username: str, email: str, is_admin: bool):
+    if not is_admin:
+        raise Exception("Not authorized")
+
+    _cognito.admin_create_user(
+        UserPoolId=COGNITO_USER_POOL_ID,
+        Username=username,
+        UserAttributes=[{"Name": "email", "Value": email}],
+        DesiredDeliveryMediums=["EMAIL"],
+    )
+    return True
+
+
+def delete_user(username: str, is_admin: bool):
+    if not is_admin:
+        raise Exception("Not authorized")
+
+    _cognito.admin_delete_user(
+        UserPoolId=COGNITO_USER_POOL_ID,
+        Username=username,
+    )
+    return True
