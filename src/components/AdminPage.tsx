@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/api";
 import { signOut } from "aws-amplify/auth";
-import { CREATE_USER, DELETE_USER } from "../graphql/operations";
+import { LIST_USERS, CREATE_USER, DELETE_USER } from "../graphql/operations";
 
 const gql = generateClient();
 
@@ -14,6 +14,9 @@ interface Props {
 }
 
 export default function AdminPage({ onBack, onSignOut }: Props) {
+  const [users, setUsers] = useState<{ username: string; email: string | null }[]>([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+
   const [createSubmitting, setCreateSubmitting] = useState(false);
   const [createError, setCreateError] = useState("");
   const [createSuccess, setCreateSuccess] = useState("");
@@ -22,6 +25,17 @@ export default function AdminPage({ onBack, onSignOut }: Props) {
   const [deleteError, setDeleteError] = useState("");
   const [deleteSuccess, setDeleteSuccess] = useState("");
   const [pendingDelete, setPendingDelete] = useState("");
+
+  async function loadUsers() {
+    try {
+      const res = (await gql.graphql({ query: LIST_USERS })) as any;
+      setUsers(res.data.listUsers ?? []);
+    } finally {
+      setUsersLoading(false);
+    }
+  }
+
+  useEffect(() => { loadUsers(); }, []);
 
   async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -50,6 +64,7 @@ export default function AdminPage({ onBack, onSignOut }: Props) {
       await gql.graphql({ query: DELETE_USER, variables: { username: pendingDelete } });
       setDeleteSuccess(`Bruger "${pendingDelete}" er slettet.`);
       setPendingDelete("");
+      loadUsers();
     } catch (err: any) {
       setDeleteError(err?.errors?.[0]?.message ?? "Kunne ikke slette bruger.");
     } finally {
@@ -104,18 +119,31 @@ export default function AdminPage({ onBack, onSignOut }: Props) {
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-400">Slet bruger</h2>
           {!pendingDelete ? (
-            <form onSubmit={(e) => { e.preventDefault(); const u = (e.currentTarget.elements.namedItem("username") as HTMLInputElement).value.trim(); setPendingDelete(u); setDeleteError(""); setDeleteSuccess(""); }} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-medium uppercase tracking-widest text-zinc-400">Brugernavn</label>
-                <input name="username" type="text" required placeholder="brugernavn der skal slettes" className={inputClass} />
-              </div>
-              {deleteError && <p className="text-sm text-red-400">{deleteError}</p>}
-              {deleteSuccess && <p className="text-sm text-green-400">{deleteSuccess}</p>}
-              <button type="submit"
-                className="mt-2 w-full rounded-xl border border-red-800 py-3 text-sm font-semibold text-red-400 transition hover:border-red-600 hover:text-red-300">
-                Slet bruger
-              </button>
-            </form>
+            <>
+              {deleteSuccess && <p className="mb-3 text-sm text-green-400">{deleteSuccess}</p>}
+              {deleteError && <p className="mb-3 text-sm text-red-400">{deleteError}</p>}
+              {usersLoading ? (
+                <div className="flex justify-center py-6">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-400" />
+                </div>
+              ) : users.length === 0 ? (
+                <p className="text-sm text-zinc-500">Ingen brugere fundet.</p>
+              ) : (
+                <ul className="flex flex-col gap-2">
+                  {users.map((u) => (
+                    <li key={u.username}>
+                      <button
+                        onClick={() => { setPendingDelete(u.username); setDeleteError(""); setDeleteSuccess(""); }}
+                        className="w-full rounded-xl border border-zinc-700 px-4 py-3 text-left text-sm transition hover:border-red-800 hover:text-red-400"
+                      >
+                        <span className="font-medium text-white">{u.username}</span>
+                        {u.email && <span className="ml-2 text-zinc-500">{u.email}</span>}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           ) : (
             <div className="flex flex-col gap-4">
               <p className="text-sm text-zinc-300">

@@ -25,10 +25,16 @@ type Round {
   recordedAt: AWSDateTime!
 }
 
+type User {
+  username: String!
+  email: String
+}
+
 type Query {
   listMyGroups: [Group!]!
   listMembers(groupId: ID!): [Member!]!
   listRoundsInCycle(groupId: ID!, cycleNumber: Int!): [Round!]!
+  listUsers: [User!]!
 }
 
 type Mutation {
